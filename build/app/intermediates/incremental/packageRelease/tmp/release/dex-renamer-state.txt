@@ -1,0 +1,4 @@
+#Sat Oct 12 14:48:56 EDT 2024
+base.0=C\:\\M.A.D\\Fitness_Tracker_App\\fta\\build\\app\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
