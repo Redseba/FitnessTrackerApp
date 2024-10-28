@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'entry_screen.dart';  // Import the screen where CRUD operations happen
-import 'database_helper.dart'; // Import the database helper
+import 'entry_screen.dart';
+import 'database_helper.dart';
 
 void main() {
   runApp(const MyApp());

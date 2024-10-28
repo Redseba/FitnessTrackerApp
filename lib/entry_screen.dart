@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
+import 'entry_clicked_screen.dart';
 
 class EntryScreen extends StatefulWidget {
   final String title;
@@ -74,12 +75,12 @@ class _EntryScreenState extends State<EntryScreen> {
                     'title': _titleController.text,
                     'description': _descriptionController.text.isNotEmpty 
                         ? _descriptionController.text 
-                        : '', // Save empty string instead of null
+                        : '',
                     'containerId': widget.containerId,
                   };
 
                   await _dbHelper.insertEntry(entry);
-                  widget.onCaloriesUpdated(); // Update total calories on main screen
+                  widget.onCaloriesUpdated();
 
                   _titleController.clear();
                   _descriptionController.clear();
@@ -107,6 +108,12 @@ class _EntryScreenState extends State<EntryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop(); // Go back to the previous screen
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -124,10 +131,24 @@ class _EntryScreenState extends State<EntryScreen> {
               child: ListView.builder(
                 itemCount: _entries.length,
                 itemBuilder: (context, index) {
-                  return Card(
-                    child: ListTile(
-                      title: Text(_entries[index]['title']),
-                      subtitle: Text(_entries[index]['description'] ?? ''), // Show blank instead of 'No description'
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EntryClickedScreen(
+                            entryTitle: _entries[index]['title'],
+                            entryId: _entries[index]['id'],
+                            totalCalories: totalCalories, // Pass totalCalories
+                          ),
+                        ),
+                      );
+                    },
+                    child: Card(
+                      child: ListTile(
+                        title: Text(_entries[index]['title']),
+                        subtitle: Text(_entries[index]['description'] ?? ''),
+                      ),
                     ),
                   );
                 },
@@ -136,9 +157,20 @@ class _EntryScreenState extends State<EntryScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showAddEntryDialog,
-        child: const Icon(Icons.add),
+      floatingActionButton: Container(
+        alignment: Alignment.bottomCenter,
+        padding: const EdgeInsets.only(bottom: 16.0),
+        child: SizedBox(
+          width: 150, // Set a specific width for the button
+          child: ElevatedButton(
+            onPressed: _showAddEntryDialog,
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16), // Vertical padding for the button
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Add Entry', style: TextStyle(fontSize: 16)), // Text inside the button
+          ),
+        ),
       ),
     );
   }

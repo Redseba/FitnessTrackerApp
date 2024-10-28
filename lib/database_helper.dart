@@ -3,9 +3,7 @@ import 'package:path/path.dart';
 
 class DatabaseHelper {
   DatabaseHelper._privateConstructor();
-  
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
-  
   static Database? _database;
 
   Future<Database> get database async {
@@ -18,9 +16,8 @@ class DatabaseHelper {
     String path = join(await getDatabasesPath(), 'app_database.db');
     return await openDatabase(
       path,
-      version: 2,
+      version: 1,
       onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
     );
   }
 
@@ -33,11 +30,16 @@ class DatabaseHelper {
         containerId INTEGER
       )
     ''');
-  }
 
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    await db.execute('DROP TABLE IF EXISTS entries');
-    await _onCreate(db, newVersion);
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS total_calories (
+        id INTEGER PRIMARY KEY,
+        total INTEGER
+      )
+    ''');
+
+    // Initialize total calories with 0
+    await db.insert('total_calories', {'id': 1, 'total': 0});
   }
 
   Future<void> insertEntry(Map<String, dynamic> entry) async {
@@ -50,9 +52,18 @@ class DatabaseHelper {
     return await db.query('entries', where: 'containerId = ?', whereArgs: [containerId]);
   }
 
-  // Dummy implementation for total calories; adjust logic as needed later.
+  Future<void> updateTotalCalories(int totalCalories) async {
+    final db = await database;
+    await db.insert(
+      'total_calories',
+      {'id': 1, 'total': totalCalories},
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
   Future<int> getTotalCalories() async {
-    // Return 0 for now since we don't have a calories column
-    return 0; 
+    final db = await database;
+    final List<Map<String, dynamic>> result = await db.query('total_calories', where: 'id = ?', whereArgs: [1]);
+    return result.isNotEmpty ? result.first['total'] : 0;
   }
 }
