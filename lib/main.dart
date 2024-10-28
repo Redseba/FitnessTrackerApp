@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'entry_screen.dart';
 import 'database_helper.dart';
+import 'log_screen.dart'; // Import the new LogScreen
 
 void main() {
   runApp(const MyApp());
@@ -70,12 +71,40 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _navigateToLogScreen() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LogScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: <Widget>[
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.deepPurple,
+              ),
+              child: Text(
+                'Navigation',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ),
+            ListTile(
+              title: const Text('Log Entries'),
+              onTap: _navigateToLogScreen,
+            ),
+            // Add more navigation items here if needed
+          ],
+        ),
       ),
       body: Center(
         child: Column(
